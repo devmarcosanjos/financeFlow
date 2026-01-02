@@ -11,6 +11,12 @@
     <string name="nome_receita_label">Nome</string>
     <string name="nome_receita_hint">Ex: Salário</string>
 
+    <!-- Tela de Edição -->
+    <string name="edit_title">Editar Transação</string>
+    <string name="atualizar_button">Atualizar</string>
+    <string name="voltar_button">Voltar</string>
+    <string name="excluir_button">Excluir</string>
+
     <!-- Comum -->
     <string name="valor_label">R$</string>
     <string name="categoria_label">Categoria</string>

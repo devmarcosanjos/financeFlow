@@ -1,4 +1,4 @@
-package com.marcosanjos.financeflow
+package com.marcosanjos.financeflow.ui
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -6,10 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.marcosanjos.financeflow.R
+import com.marcosanjos.financeflow.data.Despesa
+import com.marcosanjos.financeflow.data.Receita
+import com.marcosanjos.financeflow.data.Transacao
 import java.text.NumberFormat
 import java.util.Locale
 
-class TransacaoAdapter(private val transacoes: List<Transacao>) : RecyclerView.Adapter<TransacaoAdapter.TransacaoViewHolder>() {
+class TransacaoAdapter(
+    private val transacoes: List<Transacao>,
+    private val onItemClick: (Transacao) -> Unit
+) : RecyclerView.Adapter<TransacaoAdapter.TransacaoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransacaoViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_despesa, parent, false)
@@ -19,6 +26,7 @@ class TransacaoAdapter(private val transacoes: List<Transacao>) : RecyclerView.A
     override fun onBindViewHolder(holder: TransacaoViewHolder, position: Int) {
         val transacao = transacoes[position]
         holder.bind(transacao)
+        holder.itemView.setOnClickListener { onItemClick(transacao) }
     }
 
     override fun getItemCount(): Int = transacoes.size
@@ -32,7 +40,8 @@ class TransacaoAdapter(private val transacoes: List<Transacao>) : RecyclerView.A
             nomeTextView.text = transacao.nome
             categoriaTextView.text = transacao.categoria
 
-            val formatoMoeda = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+            // Corrigindo o warning do Locale
+            val formatoMoeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
 
             when (transacao) {
                 is Despesa -> {

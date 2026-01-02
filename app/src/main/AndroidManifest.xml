@@ -11,21 +11,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinanceFlow">
+
+        <!-- A TELA PRINCIPAL agora é a tela de lançamento -->
         <activity
-            android:name=".receitaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".despesaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Demais telas do aplicativo -->
+        <activity
+            android:name=".ui.ReceitaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.DespesaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.EditActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

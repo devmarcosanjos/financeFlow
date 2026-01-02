@@ -1,7 +1,8 @@
-package com.marcosanjos.financeflow
+package com.marcosanjos.financeflow.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,7 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.marcosanjos.financeflow.FinanceDbHelper
+import com.marcosanjos.financeflow.R
+import com.marcosanjos.financeflow.data.FinanceDbHelper
+import com.marcosanjos.financeflow.data.Receita
+import com.marcosanjos.financeflow.data.Despesa
+import com.marcosanjos.financeflow.data.Transacao
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -22,24 +27,43 @@ class MainActivity : AppCompatActivity() {
 
     private var saldoAtual = 0.0
 
-    // Launcher para a tela de Receita
     private val getReceitaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val novaReceita = result.data?.getParcelableExtra("NOVA_RECEITA", Receita::class.java)
-            if (novaReceita != null) {
-                dbHelper.addTransacao(novaReceita)
+            result.data?.getParcelableExtra("NOVA_RECEITA", Receita::class.java)?.let {
+                dbHelper.addTransacao(it)
                 loadDataAndRefreshUI()
             }
         }
     }
 
-    // Launcher para a tela de Despesa
     private val getDespesaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val novaDespesa = result.data?.getParcelableExtra("NOVA_DESPESA", Despesa::class.java)
-            if (novaDespesa != null) {
-                dbHelper.addTransacao(novaDespesa)
+            result.data?.getParcelableExtra("NOVA_DESPESA", Despesa::class.java)?.let {
+                dbHelper.addTransacao(it)
                 loadDataAndRefreshUI()
+            }
+        }
+    }
+
+    private val getEditResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                val transacaoEditada = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    result.data?.getParcelableExtra("TRANSACAO_EDITADA", Transacao::class.java)
+                } else {
+                    @Suppress("DEPRECATION") result.data?.getParcelableExtra("TRANSACAO_EDITADA")
+                }
+                if (transacaoEditada != null) {
+                    dbHelper.updateTransacao(transacaoEditada)
+                    loadDataAndRefreshUI()
+                }
+            }
+            EditActivity.RESULT_DELETE -> {
+                val transacaoId = result.data?.getLongExtra("TRANSACAO_ID_PARA_DELETAR", -1L)
+                if (transacaoId != null && transacaoId != -1L) {
+                    dbHelper.deleteTransacao(transacaoId)
+                    loadDataAndRefreshUI()
+                }
             }
         }
     }
@@ -49,11 +73,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         dbHelper = FinanceDbHelper(this)
-
         saldoTextView = findViewById(R.id.tvSaldoValue)
 
+        transacaoAdapter = TransacaoAdapter(transacoes) { transacao ->
+            val intent = Intent(this, EditActivity::class.java).apply {
+                putExtra("TRANSACAO_PARA_EDITAR", transacao)
+            }
+            getEditResult.launch(intent)
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewDespesas)
-        transacaoAdapter = TransacaoAdapter(transacoes)
         recyclerView.adapter = transacaoAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -64,12 +93,12 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_receita -> {
-                    val intent = Intent(this, receitaActivity::class.java)
+                    val intent = Intent(this, ReceitaActivity::class.java)
                     getReceitaResult.launch(intent)
                     true
                 }
                 R.id.nav_despesa -> {
-                    val intent = Intent(this, despesaActivity::class.java)
+                    val intent = Intent(this, DespesaActivity::class.java)
                     getDespesaResult.launch(intent)
                     true
                 }
@@ -95,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun atualizarSaldoNaTela() {
-        val formatoMoeda = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+        val formatoMoeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
         saldoTextView.text = formatoMoeda.format(saldoAtual)
     }
 }
