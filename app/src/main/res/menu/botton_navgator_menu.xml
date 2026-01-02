@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_despesa"
-        android:title="Despesa" />
+        android:title="Despesa"
+        android:icon="@drawable/despesa" />
     <item
         android:id="@+id/nav_receita"
-        android:title="Receita" />
+        android:title="Receita"
+        android:icon="@drawable/dinheiro" />
 </menu>

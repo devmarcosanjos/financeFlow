@@ -5,11 +5,23 @@
     <string name="despesa_title">Despesa</string>
     <string name="nome_despesa_label">Nome</string>
     <string name="nome_despesa_hint">Ex: Almoço</string>
+    <string-array name="expense_categories">
+        <item>Alimentação</item>
+        <item>Transporte</item>
+        <item>Casa</item>
+        <item>Educação</item>
+        <item>Outros</item>
+    </string-array>
 
     <!-- Tela de Receita -->
     <string name="receita_title">Receita</string>
     <string name="nome_receita_label">Nome</string>
     <string name="nome_receita_hint">Ex: Salário</string>
+    <string-array name="income_categories">
+        <item>Salário</item>
+        <item>Freela</item>
+        <item>Extra</item>
+    </string-array>
 
     <!-- Tela de Edição -->
     <string name="edit_title">Editar Transação</string>
@@ -24,4 +36,12 @@
     <string name="valor_hint">100,00</string>
     <string name="confirmar_button">Confirmar</string>
     <string name="cancelar_button">Cancelar</string>
+    <string name="data_label">Data</string>
+    <string name="data_hint">dd/mm/aaaa</string>
+    <string name="tipo_pagamento_label">Tipo Pagamento</string>
+    <string-array name="payment_types">
+        <item>Crédito</item>
+        <item>Débito</item>
+        <item>Dinheiro</item>
+    </string-array>
 </resources>

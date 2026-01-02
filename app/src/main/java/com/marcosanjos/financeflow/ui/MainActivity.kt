@@ -29,7 +29,13 @@ class MainActivity : AppCompatActivity() {
 
     private val getReceitaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.getParcelableExtra("NOVA_RECEITA", Receita::class.java)?.let {
+            val novaReceita = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                result.data?.getParcelableExtra("NOVA_RECEITA", Receita::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                result.data?.getParcelableExtra<Receita>("NOVA_RECEITA")
+            }
+            novaReceita?.let {
                 dbHelper.addTransacao(it)
                 loadDataAndRefreshUI()
             }
@@ -38,7 +44,13 @@ class MainActivity : AppCompatActivity() {
 
     private val getDespesaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.getParcelableExtra("NOVA_DESPESA", Despesa::class.java)?.let {
+            val novaDespesa = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                result.data?.getParcelableExtra("NOVA_DESPESA", Despesa::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                result.data?.getParcelableExtra<Despesa>("NOVA_DESPESA")
+            }
+            novaDespesa?.let {
                 dbHelper.addTransacao(it)
                 loadDataAndRefreshUI()
             }

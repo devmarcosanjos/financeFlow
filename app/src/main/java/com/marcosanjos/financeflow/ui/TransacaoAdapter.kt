@@ -34,11 +34,13 @@ class TransacaoAdapter(
     class TransacaoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nomeTextView: TextView = itemView.findViewById(R.id.tvNomeDespesa)
         private val categoriaTextView: TextView = itemView.findViewById(R.id.tvCategoriaDespesa)
+        private val dataTextView: TextView = itemView.findViewById(R.id.tvDataDespesa) // Novo TextView para a data
         private val valorTextView: TextView = itemView.findViewById(R.id.tvValorDespesa)
 
         fun bind(transacao: Transacao) {
             nomeTextView.text = transacao.nome
             categoriaTextView.text = transacao.categoria
+            dataTextView.text = transacao.data // Exibe a data
 
             // Corrigindo o warning do Locale
             val formatoMoeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))

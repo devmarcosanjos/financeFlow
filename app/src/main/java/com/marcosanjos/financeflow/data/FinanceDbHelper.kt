@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 4 // Versão incrementada
         private const val DATABASE_NAME = "financeflow.db"
         private const val TABLE_TRANSACOES = "transacoes"
 
@@ -17,6 +17,8 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         private const val KEY_NOME = "nome"
         private const val KEY_VALOR = "valor"
         private const val KEY_CATEGORIA = "categoria"
+        private const val KEY_DATA = "data"
+        private const val KEY_TIPO_PAGAMENTO = "tipo_pagamento" // Nova coluna
 
         private const val TIPO_DESPESA = 1
         private const val TIPO_RECEITA = 2
@@ -28,13 +30,16 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 + KEY_TIPO + " INTEGER,"
                 + KEY_NOME + " TEXT,"
                 + KEY_VALOR + " REAL,"
-                + KEY_CATEGORIA + " TEXT" + ")")
+                + KEY_CATEGORIA + " TEXT,"
+                + KEY_DATA + " TEXT,"
+                + KEY_TIPO_PAGAMENTO + " TEXT" + ")") // Adicionada a coluna de tipo de pagamento
         db?.execSQL(createTableSQL)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS $TABLE_TRANSACOES")
-        onCreate(db)
+        if (oldVersion < 4) {
+            db?.execSQL("ALTER TABLE $TABLE_TRANSACOES ADD COLUMN $KEY_TIPO_PAGAMENTO TEXT")
+        }
     }
 
     fun addTransacao(transacao: Transacao) {
@@ -43,8 +48,16 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             put(KEY_NOME, transacao.nome)
             put(KEY_VALOR, transacao.valor)
             put(KEY_CATEGORIA, transacao.categoria)
-            val tipo = if (transacao is Receita) TIPO_RECEITA else TIPO_DESPESA
-            put(KEY_TIPO, tipo)
+            put(KEY_DATA, transacao.data)
+            when (transacao) {
+                is Receita -> {
+                    put(KEY_TIPO, TIPO_RECEITA)
+                }
+                is Despesa -> {
+                    put(KEY_TIPO, TIPO_DESPESA)
+                    put(KEY_TIPO_PAGAMENTO, transacao.tipoPagamento)
+                }
+            }
         }
         db.insert(TABLE_TRANSACOES, null, values)
         db.close()
@@ -56,6 +69,10 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             put(KEY_NOME, transacao.nome)
             put(KEY_VALOR, transacao.valor)
             put(KEY_CATEGORIA, transacao.categoria)
+            put(KEY_DATA, transacao.data)
+            if (transacao is Despesa) {
+                put(KEY_TIPO_PAGAMENTO, transacao.tipoPagamento)
+            }
         }
         val success = db.update(TABLE_TRANSACOES, values, "$KEY_ID = ?", arrayOf(transacao.id.toString()))
         db.close()
@@ -64,7 +81,6 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     fun deleteTransacao(id: Long): Int {
         val db = this.writableDatabase
-        // Deleta a linha onde o ID corresponde
         val success = db.delete(TABLE_TRANSACOES, "$KEY_ID = ?", arrayOf(id.toString()))
         db.close()
         return success
@@ -83,11 +99,14 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 val nome = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NOME))
                 val valor = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_VALOR))
                 val categoria = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORIA))
+                val data = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATA))
 
                 val transacao = if (tipo == TIPO_RECEITA) {
-                    Receita(id, nome, valor, categoria)
+                    Receita(id, nome, valor, categoria, data)
                 } else {
-                    Despesa(id, nome, valor, categoria)
+                    val tipoPagamentoIndex = cursor.getColumnIndex(KEY_TIPO_PAGAMENTO)
+                    val tipoPagamento = if (tipoPagamentoIndex != -1) cursor.getString(tipoPagamentoIndex) ?: "" else ""
+                    Despesa(id, nome, valor, categoria, data, tipoPagamento)
                 }
                 transacoesList.add(transacao)
             } while (cursor.moveToNext())

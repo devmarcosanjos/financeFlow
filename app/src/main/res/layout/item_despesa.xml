@@ -24,6 +24,14 @@
         app:layout_constraintTop_toBottomOf="@+id/tvNomeDespesa" />
 
     <TextView
+        android:id="@+id/tvDataDespesa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="dd/mm/aaaa"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvValorDespesa" />
+
+    <TextView
         android:id="@+id/tvValorDespesa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
