@@ -1,15 +1,7 @@
 <resources>
     <string name="app_name">financeFlow</string>
 
-    <!-- Tela de Despesa -->
-    <string name="despesa_title">Despesa</string>
-    <string name="nome_despesa_label">Nome</string>
-    <string name="nome_despesa_hint">Ex: Almoço</string>
 
-    <!-- Tela de Receita -->
-    <string name="receita_title">Receita</string>
-    <string name="nome_receita_label">Nome</string>
-    <string name="nome_receita_hint">Ex: Salário</string>
 
     <!-- Comum -->
     <string name="valor_label">R$</string>
@@ -18,4 +10,24 @@
     <string name="valor_hint">100,00</string>
     <string name="confirmar_button">Confirmar</string>
     <string name="cancelar_button">Cancelar</string>
+
+    <string-array name="receita_categorias">
+        <item>Salário</item>
+        <item>Freela</item>
+        <item>Extra</item>
+    </string-array>
+
+    <string-array name="despesa_categorias">
+        <item>Mercado</item>
+        <item>Transporte</item>
+        <item>Casa</item>
+        <item>Educação</item>
+        <item>Outros</item>
+    </string-array>
+
+    <string-array name="despesa_tipos">
+        <item>Dinheiro</item>
+        <item>Crédito</item>
+        <item>Débito</item>
+    </string-array>
 </resources>

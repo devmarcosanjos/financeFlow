@@ -4,53 +4,169 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:padding="16dp"
+    tools:context=".view.MainActivity">
 
     <TextView
-        android:id="@+id/tvNameSaldo"
+        android:id="@+id/tvTipoLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="84dp"
-        android:text="Saldo"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="64dp"
+        android:text="Tipo:"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvSaldoCifrao"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="R$"
-        app:layout_constraintStart_toStartOf="@+id/tvNameSaldo"
-        app:layout_constraintTop_toBottomOf="@+id/tvNameSaldo" />
-
-    <TextView
-        android:id="@+id/tvSaldoValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="1000"
-        app:layout_constraintBaseline_toBaselineOf="@+id/tvSaldoCifrao"
-        app:layout_constraintStart_toEndOf="@+id/tvSaldoCifrao" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDespesas"
+    <RadioGroup
+        android:id="@+id/rgTipo"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/tvSaldoValue"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTipoLabel"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvTipoLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvTipoLabel">
+
+        <RadioButton
+            android:id="@+id/rbReceita"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Receita" />
+
+        <RadioButton
+            android:id="@+id/rbDespesa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="Despesa" />
+    </RadioGroup>
+
+    <!-- Campos específicos de Despesa (inicialmente ocultos) -->
+     <Spinner
+        android:id="@+id/spTipoPagamentoMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:entries="@array/despesa_tipos"
+        android:minHeight="48dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/rgTipo"
+        app:layout_constraintTop_toBottomOf="@+id/rgTipo" />
+
+    <TextView
+        android:id="@+id/tvValorLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Valor:"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/spTipoPagamentoMain"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/botton_navgator_menu" />
+        app:layout_goneMarginTop="24dp" />
+
+    <EditText
+        android:id="@+id/etValorMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:hint="0.00"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@+id/tvValorLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvValorLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvValorLabel" />
+
+    <TextView
+        android:id="@+id/tvDescricaoLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Descrição:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvValorLabel" />
+
+    <EditText
+        android:id="@+id/etDescricaoMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Ex: Salário, Aluguel"
+        android:layout_marginStart="16dp"
+        android:inputType="textCapSentences"
+        app:layout_constraintBottom_toBottomOf="@+id/tvDescricaoLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvDescricaoLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvDescricaoLabel" />
+        
+    <TextView
+        android:id="@+id/tvCategoriaLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Categoria:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDescricaoLabel" />
+
+    <Spinner
+        android:id="@+id/spCategoriaMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:entries="@array/receita_categorias"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCategoriaLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvCategoriaLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvCategoriaLabel" />
+
+    <TextView
+        android:id="@+id/tvDataLabelMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Data Lanc.:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCategoriaLabel" />
+
+    <TextView
+        android:id="@+id/tvDataValueMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="01/01/2026"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+        android:background="?android:attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/tvDataLabelMain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvDataLabelMain"
+        app:layout_constraintTop_toTopOf="@+id/tvDataLabelMain" />
+
+    <Button
+        android:id="@+id/btnLancar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Lançar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDataLabelMain" />
+
+    <Button
+        android:id="@+id/btnVerLancamentos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Ver Lançamentos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLancar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

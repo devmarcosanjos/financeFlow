@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -9,7 +10,7 @@
         android:id="@+id/tvNomeDespesa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nome da Despesa"
+        tools:text="Nome da Despesa"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,7 +20,7 @@
         android:id="@+id/tvCategoriaDespesa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Categoria"
+        tools:text="Categoria"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvNomeDespesa" />
 
@@ -27,10 +28,19 @@
         android:id="@+id/tvValorDespesa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="R$ 100,00"
+        tools:text="R$ 100,00"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvDataTransacao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="01/01/2026"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvValorDespesa" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

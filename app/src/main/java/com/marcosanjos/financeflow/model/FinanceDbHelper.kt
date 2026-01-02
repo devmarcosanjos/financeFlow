@@ -1,4 +1,4 @@
-package com.marcosanjos.financeflow
+package com.marcosanjos.financeflow.model
 
 import android.content.ContentValues
 import android.content.Context
@@ -8,8 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        // 1. Versão do banco incrementada para forçar a atualização da estrutura
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 4
         private const val DATABASE_NAME = "financeflow.db"
         private const val TABLE_TRANSACOES = "transacoes"
 
@@ -18,6 +17,8 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         private const val KEY_NOME = "nome"
         private const val KEY_VALOR = "valor"
         private const val KEY_CATEGORIA = "categoria"
+        private const val KEY_DATA = "data"
+        private const val KEY_TIPO_PAGAMENTO = "tipo_pagamento" // Crédito, Débito, Dinheiro
 
         // Constantes para os tipos de transação
         private const val TIPO_DESPESA = 1
@@ -25,18 +26,18 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        // 2. A coluna tipo agora é INTEGER
         val createTableSQL = ("CREATE TABLE " + TABLE_TRANSACOES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY,"
                 + KEY_TIPO + " INTEGER,"
                 + KEY_NOME + " TEXT,"
                 + KEY_VALOR + " REAL,"
-                + KEY_CATEGORIA + " TEXT" + ")")
+                + KEY_CATEGORIA + " TEXT,"
+                + KEY_DATA + " INTEGER,"
+                + KEY_TIPO_PAGAMENTO + " TEXT" + ")")
         db?.execSQL(createTableSQL)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        // Deleta a tabela antiga e cria uma nova. Perde os dados existentes.
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_TRANSACOES")
         onCreate(db)
     }
@@ -47,9 +48,14 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             put(KEY_NOME, transacao.nome)
             put(KEY_VALOR, transacao.valor)
             put(KEY_CATEGORIA, transacao.categoria)
-            // 3. Salva 1 para Despesa e 2 para Receita
+            put(KEY_DATA, transacao.data)
+            
             val tipo = if (transacao is Receita) TIPO_RECEITA else TIPO_DESPESA
             put(KEY_TIPO, tipo)
+
+            if (transacao is Despesa) {
+                put(KEY_TIPO_PAGAMENTO, transacao.tipoPagamento)
+            }
         }
         db.insert(TABLE_TRANSACOES, null, values)
         db.close()
@@ -63,17 +69,23 @@ class FinanceDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
         if (cursor.moveToFirst()) {
             do {
-                // 4. Lê o tipo como um número (Int)
                 val tipo = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TIPO))
                 val nome = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NOME))
                 val valor = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_VALOR))
                 val categoria = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORIA))
-
-                // 5. Cria o objeto correto com base no número (1 ou 2)
+                val data = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_DATA))
+                
                 val transacao = if (tipo == TIPO_RECEITA) {
-                    Receita(nome, valor, categoria)
+                    Receita(nome, valor, categoria, data)
                 } else {
-                    Despesa(nome, valor, categoria)
+                    // Se não tiver a coluna (banco antigo ou nulo), retorna string vazia ou default
+                    val tipoPagamentoIndex = cursor.getColumnIndex(KEY_TIPO_PAGAMENTO)
+                    val tipoPagamento = if (tipoPagamentoIndex != -1 && !cursor.isNull(tipoPagamentoIndex)) {
+                        cursor.getString(tipoPagamentoIndex)
+                    } else {
+                        "Dinheiro"
+                    }
+                    Despesa(nome, valor, categoria, tipoPagamento, data)
                 }
                 transacoesList.add(transacao)
             } while (cursor.moveToNext())
