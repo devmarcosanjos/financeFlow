@@ -9,31 +9,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.marcosanjos.financeflow.FinanceDbHelper
 import java.text.NumberFormat
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var dbHelper: FinanceDbHelper
     private val transacoes = mutableListOf<Transacao>()
     private lateinit var transacaoAdapter: TransacaoAdapter
     private lateinit var saldoTextView: TextView
 
     private var saldoAtual = 0.0
 
-    // Launcher único para obter o resultado de qualquer transação
-    private val getTransacaoResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    // Launcher para a tela de Receita
+    private val getReceitaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val novaTransacao = result.data?.getParcelableExtra("NOVA_TRANSACAO", Transacao::class.java)
-            if (novaTransacao != null) {
-                transacoes.add(novaTransacao)
-                transacaoAdapter.notifyItemInserted(transacoes.size - 1)
+            val novaReceita = result.data?.getParcelableExtra("NOVA_RECEITA", Receita::class.java)
+            if (novaReceita != null) {
+                dbHelper.addTransacao(novaReceita)
+                loadDataAndRefreshUI()
+            }
+        }
+    }
 
-                // Atualiza o saldo com base no tipo de transação
-                when (novaTransacao) {
-                    is Receita -> saldoAtual += novaTransacao.valor
-                    is Despesa -> saldoAtual -= novaTransacao.valor
-                }
-                atualizarSaldoNaTela()
+    // Launcher para a tela de Despesa
+    private val getDespesaResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val novaDespesa = result.data?.getParcelableExtra("NOVA_DESPESA", Despesa::class.java)
+            if (novaDespesa != null) {
+                dbHelper.addTransacao(novaDespesa)
+                loadDataAndRefreshUI()
             }
         }
     }
@@ -42,13 +48,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        dbHelper = FinanceDbHelper(this)
+
         saldoTextView = findViewById(R.id.tvSaldoValue)
-        atualizarSaldoNaTela()
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewDespesas)
         transacaoAdapter = TransacaoAdapter(transacoes)
         recyclerView.adapter = transacaoAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        loadDataAndRefreshUI()
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
@@ -56,17 +65,33 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_receita -> {
                     val intent = Intent(this, receitaActivity::class.java)
-                    getTransacaoResult.launch(intent)
+                    getReceitaResult.launch(intent)
                     true
                 }
                 R.id.nav_despesa -> {
                     val intent = Intent(this, despesaActivity::class.java)
-                    getTransacaoResult.launch(intent)
+                    getDespesaResult.launch(intent)
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    private fun loadDataAndRefreshUI() {
+        val loadedTransacoes = dbHelper.getAllTransacoes()
+        transacoes.clear()
+        transacoes.addAll(loadedTransacoes)
+        transacaoAdapter.notifyDataSetChanged()
+
+        saldoAtual = 0.0
+        transacoes.forEach { transacao ->
+            when (transacao) {
+                is Receita -> saldoAtual += transacao.valor
+                is Despesa -> saldoAtual -= transacao.valor
+            }
+        }
+        atualizarSaldoNaTela()
     }
 
     private fun atualizarSaldoNaTela() {

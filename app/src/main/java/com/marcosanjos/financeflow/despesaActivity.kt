@@ -22,14 +22,13 @@ class despesaActivity : AppCompatActivity() {
             val valorStr = valorEditText.text.toString()
             val categoria = categoriaEditText.text.toString()
 
-            // Converte o valor para Double, com segurança
             val valor = valorStr.toDoubleOrNull() ?: 0.0
 
             if (nome.isNotEmpty() && valorStr.isNotEmpty() && categoria.isNotEmpty()) {
                 val despesa = Despesa(nome, valor, categoria)
 
                 val resultIntent = Intent().apply {
-                    putExtra("NOVA_TRANSACAO", despesa)
+                    putExtra("NOVA_DESPESA", despesa) // Voltando a usar a chave específica
                 }
                 setResult(Activity.RESULT_OK, resultIntent)
                 finish()

@@ -22,14 +22,13 @@ class receitaActivity : AppCompatActivity() {
             val valorStr = valorEditText.text.toString()
             val categoria = categoriaEditText.text.toString()
 
-            // Converte o valor para Double, com segurança
             val valor = valorStr.toDoubleOrNull() ?: 0.0
 
             if (nome.isNotEmpty() && valorStr.isNotEmpty() && categoria.isNotEmpty()) {
                 val receita = Receita(nome, valor, categoria)
 
                 val resultIntent = Intent().apply {
-                    putExtra("NOVA_TRANSACAO", receita)
+                    putExtra("NOVA_RECEITA", receita) // Voltando a usar a chave específica
                 }
                 setResult(Activity.RESULT_OK, resultIntent)
                 finish()
